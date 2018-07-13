@@ -19,6 +19,7 @@ const yearToInt = value => {
 const YearType = new GraphQLScalarType({
   name: 'Year',
   serialize(value) {
+    console.log(value);
     const year = yearToInt(value);
     if (Number.isNaN(year)) {
       throw new TypeError(`Invalid year: ${value}`);
@@ -33,7 +34,7 @@ const YearType = new GraphQLScalarType({
     return year;
   },
   parseLiteral(ast) {
-    if ([Kind.STRING, Kind.INT].indexOf(ast.kid) === -1) {
+    if ([Kind.STRING, Kind.INT].indexOf(ast.kind) === -1) {
       throw new GraphQLError(`Expected String or Int, received ${ast.kind}`);
     }
     const year = yearToInt(ast.value);
