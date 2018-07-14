@@ -1,7 +1,7 @@
 const { GraphQLScalarType } = require('graphql');
 
-const StringList = new GraphQLScalarType({
-  name: 'StringList',
+const DescriptionType = new GraphQLScalarType({
+  name: 'Description',
   serialize(value) {
     if (typeof value === 'string') {
       return [value];
@@ -10,4 +10,4 @@ const StringList = new GraphQLScalarType({
   },
 });
 
-module.exports = StringList;
+module.exports = DescriptionType;

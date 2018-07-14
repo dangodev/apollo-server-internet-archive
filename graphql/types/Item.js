@@ -6,11 +6,13 @@ const {
 } = require('graphql');
 
 const CopyrightStatusType = require('./CopyrightStatus');
+const CollectionType = require('./Collection');
 const CountryType = require('./Country');
+const CreatorType = require('./Creator');
 const DateTimeType = require('./DateTime');
+const DescriptionType = require('./Description');
 const FileType = require('./File');
 const LanguageType = require('./Language');
-const StringListType = require('./StringList');
 const YearType = require('./Year');
 
 const ItemType = new GraphQLObjectType({
@@ -34,15 +36,15 @@ const ItemType = new GraphQLObjectType({
           call_number: { type: GraphQLString },
           camera: { type: GraphQLString },
           city: { type: GraphQLString },
-          collection: { type: StringListType },
+          collection: { type: CollectionType },
           collectionid: { type: GraphQLString },
           color: { type: GraphQLString },
           contributor: { type: GraphQLString },
           country: { type: CountryType },
-          creator: { type: StringListType },
+          creator: { type: CreatorType },
           curation: { type: GraphQLString },
           date: { type: YearType },
-          description: { type: StringListType },
+          description: { type: DescriptionType },
           donor: { type: GraphQLString },
           external_identifier: {
             type: new GraphQLList(GraphQLString),
@@ -81,6 +83,10 @@ const ItemType = new GraphQLObjectType({
           loans_status_status: {
             type: GraphQLString,
             resolve: data => data.loans_status_status,
+          },
+          mediatype: {
+            type: GraphQLString,
+            resolve: ({ mediatype, type }) => mediatype || type,
           },
           numeric_id: { type: GraphQLInt },
           oclc_id: { type: new GraphQLList(GraphQLString) },
@@ -121,10 +127,6 @@ const ItemType = new GraphQLObjectType({
           sponsordate: { type: DateTimeType },
           subject: { type: GraphQLString },
           title: { type: GraphQLString },
-          type: {
-            type: GraphQLString,
-            resolve: ({ mediatype, type }) => type || mediatype,
-          },
           updatedate: { type: new GraphQLList(DateTimeType) },
           updater: { type: new GraphQLList(GraphQLString) },
           uploader: { type: GraphQLString },
