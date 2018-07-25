@@ -1,4 +1,4 @@
-const { gql } = require('apollo-server-koa');
+const { gql, ApolloError } = require('apollo-server-koa');
 const { makeExecutableSchema } = require('graphql-tools');
 
 /* Types */
@@ -25,7 +25,7 @@ const SchemaDefinition = gql`
 
   type RootQuery {
     item(id: String!): Item
-    search(limit: Int, query: String!, sort: [String], start: Int): SearchResult
+    search(query: String!, limit: Int, sort: [String], start: Int): SearchResult
   }
 
   schema {
@@ -44,13 +44,23 @@ const resolvers = {
       { fieldNodes }
     ) => {
       // Archive.org lets you specify the fields for the JSON data for an efficient response. This auto-pulls them from the GraphQL query.
-      const getFieldsFromQuery = fieldNodes
+      const responseQuery = fieldNodes
         .find(({ name: { value } }) => value === 'search')
         .selectionSet.selections.find(
           ({ name: { value } }) => value === 'response'
-        )
-        .selectionSet.selections.find(({ name: { value } }) => value === 'docs')
-        .selectionSet.selections.map(({ name: { value } }) => value);
+        );
+      if (!responseQuery) {
+        return new ApolloError('Must request `search.response` in query.');
+      }
+      const docsQuery = responseQuery.selectionSet.selections.find(
+        ({ name: { value } }) => value === 'docs'
+      );
+      if (!docsQuery) {
+        return new ApolloError('Must request `search.response.docs` in query.');
+      }
+      const getFieldsFromQuery = docsQuery.selectionSet.selections.map(
+        ({ name: { value } }) => value
+      );
       return dataSources.archiveAPI.searchItems({
         query,
         fields: getFieldsFromQuery,

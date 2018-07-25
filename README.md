@@ -156,7 +156,7 @@ JavaScript.
 
 ### Polymorphism
 
-- Archive.org’s API can return some fields as either a string, a list of strings, or missing. In these instances a list will be always returned (empty in the case of missing data).
+- Archive.org’s API can return some fields as either a string, a list of strings, or missing. In these instances a list of strings will be always returned (or an empty list in the case of missing data).
 
 ### Language
 
