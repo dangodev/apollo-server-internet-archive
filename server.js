@@ -1,22 +1,30 @@
 const Koa = require('koa');
-const KoaRouter = require('koa-router');
-const koaBody = require('koa-bodyparser');
 const chalk = require('chalk');
-const { graphqlKoa, graphiqlKoa } = require('apollo-server-koa');
+const { ApolloServer } = require('apollo-server-koa');
+const { RESTDataSource } = require('apollo-datasource-rest');
 
 const schema = require('./graphql/schema');
 
+const PORT = 4000;
+
+class ArchiveAPI extends RESTDataSource {
+  constructor() {
+    super();
+    this.baseURL = 'https://archive.org/';
+  }
+
+  async getItem(id) {
+    return this.get(`metadata/${id}`);
+  }
+}
+
+const server = new ApolloServer({
+  schema,
+  dataSources: () => ({ archiveAPI: new ArchiveAPI() }),
+});
+
 const app = new Koa();
-const router = new KoaRouter();
-const PORT = 3000;
-
-// koaBody is needed just for POST.
-router.post('/graphql', koaBody(), graphqlKoa({ schema }));
-router.get('/graphql', graphqlKoa({ schema }));
-router.get('/graphiql', graphiqlKoa({ endpointURL: '/graphql' }));
-
-app.use(router.routes());
-app.use(router.allowedMethods());
-app.listen(PORT);
-
-console.log(chalk.green(`✓ Ready on localhost:${PORT}`));
+server.applyMiddleware({ app });
+app.listen({ port: PORT }, () =>
+  console.log(chalk.green(`✓ Ready on localhost:${PORT}`))
+);

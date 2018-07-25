@@ -1,28 +1,49 @@
-const { GraphQLObjectType, GraphQLSchema, GraphQLString } = require('graphql');
-const axios = require('axios');
-const chalk = require('chalk');
-const ItemType = require('./types/Item');
+const { makeExecutableSchema } = require('graphql-tools');
 
-const BASE_URL = 'https://archive.org';
-const ENDPOINT = {
-  ITEM: '/metadata/',
+/* Types */
+const CopyrightStatus = require('./types/CopyrightStatus');
+const File = require('./types/File');
+const Item = require('./types/Item');
+
+/* Scalars */
+const Country = require('./scalar/Country');
+const Creator = require('./scalar/Creator');
+const DateTime = require('./scalar/DateTime');
+const Description = require('./scalar/Description');
+const Language = require('./scalar/Language');
+const Year = require('./scalar/Year');
+
+const SchemaDefinition = `
+  scalar Country
+  scalar Creator
+  scalar DateTime
+  scalar Description
+  scalar Language
+  scalar Year
+
+  type RootQuery {
+    item(id: String!): Item
+  }
+
+  schema {
+    query: RootQuery
+  }
+`;
+
+const resolvers = {
+  RootQuery: {
+    item: async (_source, { id }, { dataSources }) =>
+      dataSources.archiveAPI.getItem(id),
+  },
+  Country,
+  Creator,
+  DateTime,
+  Description,
+  Language,
+  Year,
 };
 
-const ItemQuery = new GraphQLObjectType({
-  name: 'ItemQuery',
-  fields: () => ({
-    item: {
-      type: ItemType,
-      args: { id: { type: GraphQLString } },
-      resolve: (root, { id }) =>
-        axios
-          .get(`${BASE_URL}${ENDPOINT.ITEM}${id}`)
-          .then(({ config, data, status }) => {
-            console.log(`${chalk.bold(status)} ${config.url}`);
-            return data;
-          }),
-    },
-  }),
+module.exports = makeExecutableSchema({
+  typeDefs: [SchemaDefinition, CopyrightStatus, File, Item],
+  resolvers,
 });
-
-module.exports = new GraphQLSchema({ query: ItemQuery });

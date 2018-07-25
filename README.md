@@ -1,6 +1,6 @@
-# Archive-GraphQL
+# apollo-server-internet-archive
 
-GraphQL wrapper for [Archive.org](internet-archive)’s open API.
+Apollo Server v2.0 wrapper for [Archive.org](internet-archive)’s REST API.
 
 ![screenshot](screenshot.png)
 
@@ -11,9 +11,9 @@ npm i
 npm run start
 ```
 
-GraphQL endpoint is at `localhost:3000/graphql`.
+GraphQL endpoint is at `localhost:4000`.
 
-GraphiQL graphical endpoint at `localhost:3000/graphiql`.
+GraphQL playground is at `localhost:4000/graphql`.
 
 ## Schema
 
@@ -38,23 +38,22 @@ after `/details/`. For instance, for the URL
 {
   item(id: "bacteria_friend_and_foe") {
     metadata {
-      title,
-      year,
-      description,
-      creator,
-      language,
-      country,
-      type
+      subject
+      title
+      mediatype
     }
   }
 }
+
 ```
 
 ### Fields
 
 ![docs-screenshot](docs-screenshot.png)
 
-To view the data structure, clone this repo and run it locally (`npm i && npm run start'), navigate to `localhost:3000/graphiql`. Then click “Docs” in the top-right.
+To view the data structure, clone this repo and run it locally (`npm i && npm
+run start'), navigate to `localhost:4000/graphql`. Then click “Schema” on the
+top-right.
 
 ### Books
 
@@ -68,21 +67,27 @@ Coming soon!
 
 Coming soon!
 
-## Data Sanitization
+## Data Coercion
 
-This library takes the liberty of sanitizing some data.
+This endpoint adds a few niceties to make consuption & parsing easier in
+JavaScript.
 
 ### Polymorphism
 
-- If a field can either be a string or an array of strings, it’s forced to always be an array of strings (e.g: `metadata.creator`).
+- Archive.org’s API can return some fields as either a string, a list of strings, or missing. In these instances a list will be always returned (empty in the case of missing data).
 
 ### Language
 
-The `Language` field is coerced into the [RFC 5646 spec][lang-spec] (e.g: `en`, `en-CA`, `de`, `ja`, `zh-CN`).
+Archive.org’s API will return many different results for language (e.g.:
+`English` or `eng` or `en` all refer to the same language). For that reason,
+`metadata.language` is coerced into the [RFC 5646 spec][lang-spec] (e.g:
+`en`, `en-CA`, `de`, `ja`, `zh-CN`).
 
 ### Year
 
-`Year` is sanitized into an integer, with negative numbers representing `BCE` (e.g.: `1970` for _1970 CE_, `-300` for _300 BCE_).
+`metadata.year` is coerced into an integer, with negative numbers
+representing `BCE`
+(e.g.: `1970` for _1970 CE_, `-300` for _300 BCE_).
 
 
 [internet-archive]: https://archive.org

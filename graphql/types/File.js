@@ -1,25 +1,17 @@
-const {
-  GraphQLBoolean,
-  GraphQLObjectType,
-  GraphQLInt,
-  GraphQLString,
-} = require('graphql');
+const schema = `
+  type File {
+    crc32: String
+    format: String
+    md5: String
+    mtime: Int
+    name: String
+    original: String
+    private: Boolean
+    rotation: Int
+    sha1: String
+    size: Int
+    source: String
+  }
+`;
 
-const FileType = new GraphQLObjectType({
-  name: 'File',
-  fields: {
-    crc32: { type: GraphQLString },
-    format: { type: GraphQLString },
-    md5: { type: GraphQLString },
-    mtime: { type: GraphQLInt },
-    name: { type: GraphQLString },
-    original: { type: GraphQLString },
-    private: { type: GraphQLBoolean },
-    rotation: { type: GraphQLInt },
-    sha1: { type: GraphQLString },
-    size: { type: GraphQLInt },
-    source: { type: GraphQLString },
-  },
-});
-
-module.exports = FileType;
+module.exports = schema;

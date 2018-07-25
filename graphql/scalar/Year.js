@@ -16,10 +16,9 @@ const yearToInt = value => {
     : Math.abs(year);
 };
 
-const YearType = new GraphQLScalarType({
+const Year = new GraphQLScalarType({
   name: 'Year',
   serialize(value) {
-    console.log(value);
     const year = yearToInt(value);
     if (Number.isNaN(year)) {
       throw new TypeError(`Invalid year: ${value}`);
@@ -45,4 +44,4 @@ const YearType = new GraphQLScalarType({
   },
 });
 
-module.exports = YearType;
+module.exports = Year;
