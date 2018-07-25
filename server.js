@@ -2,6 +2,7 @@ const Koa = require('koa');
 const chalk = require('chalk');
 const { ApolloServer } = require('apollo-server-koa');
 const { RESTDataSource } = require('apollo-datasource-rest');
+const queryString = require('query-string');
 
 const schema = require('./graphql/schema');
 
@@ -15,6 +16,20 @@ class ArchiveAPI extends RESTDataSource {
 
   async getItem(id) {
     return this.get(`metadata/${id}`);
+  }
+
+  async searchItems({ query, fields, limit, start, sort }) {
+    const params = queryString.stringify(
+      {
+        fl: fields,
+        page: start,
+        q: query,
+        rows: limit,
+        sort,
+      },
+      { arrayFormat: 'bracket' }
+    );
+    return this.get(`advancedsearch.php?${params}&output=json`);
   }
 }
 

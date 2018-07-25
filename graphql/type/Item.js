@@ -1,4 +1,6 @@
-const schema = `
+const { gql } = require('apollo-server-koa');
+
+const schema = gql`
   type Item {
     created: Int
     d1: String
